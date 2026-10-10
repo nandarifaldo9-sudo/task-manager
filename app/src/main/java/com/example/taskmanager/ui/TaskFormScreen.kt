@@ -15,12 +15,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -93,7 +91,7 @@ fun TaskFormScreen(taskId: Int?, vm: TaskViewModel, onBack: () -> Unit) {
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            OutlinedTextField(
+            MinimalField(
                 value = mataKuliah,
                 onValueChange = { mataKuliah = it },
                 label = { Text("Mata kuliah") },
@@ -101,7 +99,7 @@ fun TaskFormScreen(taskId: Int?, vm: TaskViewModel, onBack: () -> Unit) {
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
-            OutlinedTextField(
+            MinimalField(
                 value = judul,
                 onValueChange = { judul = it },
                 label = { Text("Judul tugas") },
@@ -109,7 +107,7 @@ fun TaskFormScreen(taskId: Int?, vm: TaskViewModel, onBack: () -> Unit) {
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
-            OutlinedTextField(
+            MinimalField(
                 value = deskripsi,
                 onValueChange = { deskripsi = it },
                 label = { Text("Deskripsi") },
@@ -127,7 +125,7 @@ fun TaskFormScreen(taskId: Int?, vm: TaskViewModel, onBack: () -> Unit) {
             Text("Prioritas", style = MaterialTheme.typography.labelLarge)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TaskPriority.entries.forEach { p ->
-                    FilterChip(
+                    ChoicePill(
                         selected = prioritas == p,
                         onClick = { prioritas = p },
                         label = { Text(p.label) }
@@ -138,10 +136,11 @@ fun TaskFormScreen(taskId: Int?, vm: TaskViewModel, onBack: () -> Unit) {
             Text("Status", style = MaterialTheme.typography.labelLarge)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TaskStatus.entries.forEach { s ->
-                    FilterChip(
+                    ChoicePill(
                         selected = status == s,
                         onClick = { status = s },
-                        label = { Text(s.label) }
+                        label = { Text(s.label) },
+                        selectedColor = statusColor(s)
                     )
                 }
             }

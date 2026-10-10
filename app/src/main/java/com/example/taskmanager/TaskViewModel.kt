@@ -18,7 +18,9 @@ import kotlinx.coroutines.launch
 data class TaskListUiState(
     val tasks: List<Task> = emptyList(),
     val query: String = "",
-    val statusFilter: TaskStatus? = null
+    val statusFilter: TaskStatus? = null,
+    val totalCount: Int = 0,
+    val activeCount: Int = 0
 )
 
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
@@ -38,7 +40,9 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
                                     t.mataKuliah.contains(q, ignoreCase = true))
                 },
                 query = q,
-                statusFilter = filter
+                statusFilter = filter,
+                totalCount = tasks.size,
+                activeCount = tasks.count { it.status != TaskStatus.SELESAI }
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TaskListUiState())
 

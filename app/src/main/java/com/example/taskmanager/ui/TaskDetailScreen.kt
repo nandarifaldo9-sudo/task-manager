@@ -6,7 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -16,7 +19,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.taskmanager.TaskViewModel
 import com.example.taskmanager.data.TaskStatus
@@ -50,7 +54,7 @@ fun TaskDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detail Tugas") },
+                title = {},
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
@@ -70,32 +74,64 @@ fun TaskDetailScreen(
         val t = task
         if (t == null) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("Memuat...")
+                Text("Memuat...", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
             Column(
                 modifier = Modifier
                     .padding(padding)
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                    .padding(horizontal = 20.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                Text(t.judul, style = MaterialTheme.typography.headlineSmall)
-                Text(t.mataKuliah, style = MaterialTheme.typography.titleMedium)
-                Text("Deadline: ${formatDate(t.deadline)}")
-                Text("Prioritas: ${t.prioritas.label}")
+                StatusBadge(t.status)
+                Spacer(Modifier.height(12.dp))
                 Text(
-                    t.deskripsi.ifBlank { "(tanpa deskripsi)" },
-                    style = MaterialTheme.typography.bodyLarge
+                    t.judul,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    t.mataKuliah,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp)
                 )
 
-                Text("Ubah status", style = MaterialTheme.typography.labelLarge)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Spacer(Modifier.height(24.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                InfoRow("Deadline", formatDate(t.deadline))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                InfoRow("Prioritas", t.prioritas.label)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                Spacer(Modifier.height(20.dp))
+                Text(
+                    "Deskripsi",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    t.deskripsi.ifBlank { "(tanpa deskripsi)" },
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(top = 6.dp)
+                )
+
+                Spacer(Modifier.height(28.dp))
+                Text(
+                    "Ubah status",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+                ) {
                     TaskStatus.entries.forEach { s ->
-                        FilterChip(
+                        ChoicePill(
                             selected = t.status == s,
                             onClick = { vm.updateStatus(t.id, s) },
-                            label = { Text(s.label) }
+                            label = { Text(s.label) },
+                            selectedColor = statusColor(s)
                         )
                     }
                 }
@@ -113,11 +149,24 @@ fun TaskDetailScreen(
                     showDelete = false
                     vm.delete(taskId)
                     onBack()
-                }) { Text("Hapus") }
+                }) { Text("Hapus", color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
                 TextButton(onClick = { showDelete = false }) { Text("Batal") }
             }
         )
+    }
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 14.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, fontWeight = FontWeight.Medium)
     }
 }
